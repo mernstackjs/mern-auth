@@ -1,11 +1,13 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { apiEndPoints } from "../lib/api";
 import { useNavigate } from "react-router";
 import toast from "react-hot-toast";
+import { useAuthContext } from "../content/authcontext";
 
 export default function useRegister() {
   const queryClient = useQueryClient();
+  const { setAuthUser } = useAuthContext();
 
   const navigate = useNavigate();
 
@@ -14,8 +16,9 @@ export default function useRegister() {
     onSuccess: (res) => {
       localStorage.setItem("token", res.data.token);
       queryClient.invalidateQueries(["user"]);
+      setAuthUser(res.data.user); // update context immediately
       navigate("/profile");
-      toast.success("Registered is successfully!");
+      toast.success("Logged in successfully!");
     },
     onError(error) {
       const message =
@@ -29,6 +32,7 @@ export default function useRegister() {
   return mutation;
 }
 export function useLogin() {
+  const { setAuthUser } = useAuthContext();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -38,6 +42,7 @@ export function useLogin() {
     onSuccess: (res) => {
       localStorage.setItem("token", res.data.token);
       queryClient.invalidateQueries(["user"]);
+      setAuthUser(res.data.user); // update context immediately
       navigate("/profile");
       toast.success("Logged in successfully!");
     },
@@ -53,4 +58,23 @@ export function useLogin() {
   });
 
   return mutation;
+}
+
+export function useMe() {
+  const token = localStorage.getItem("token");
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      const res = await apiEndPoints.me();
+      return res.data.user;
+    },
+    enabled: !!token,
+    retry: false,
+  });
+
+  return {
+    user: data,
+    isLoading,
+    error,
+  };
 }

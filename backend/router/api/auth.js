@@ -26,6 +26,8 @@ router.post("/register", async (req, res) => {
 
     const token = generateToken(user._id);
 
+    await user.save();
+
     res.status(201).json({
       message: "new user is registered success",
       user,
@@ -47,12 +49,14 @@ router.post("/login", async (req, res) => {
       });
     }
     const user = await User.findOne({ email });
+
     if (!user)
       return res.status(404).json({
         message: `Don't found this user`,
       });
 
     const isMatched = await user.comparePassword(password);
+
     if (!isMatched) {
       return res.status(400).json({ message: "Invalid credentials" });
     }

@@ -1,5 +1,5 @@
 const { Schema, model } = require("mongoose");
-const argon = require("argon2");
+const argon2 = require("argon2");
 const userSchema = new Schema(
   {
     name: String,
@@ -7,7 +7,7 @@ const userSchema = new Schema(
     password: String,
   },
   {
-    timeseries: true,
+    timestamps: true,
   }
 );
 
@@ -16,7 +16,7 @@ userSchema.pre("save", async function (next) {
     next();
   }
   try {
-    const hashedPassword = await argon.hash(this.password, 12);
+    const hashedPassword = await argon2.hash(this.password, 12);
     this.password = hashedPassword;
   } catch (error) {
     next(error);

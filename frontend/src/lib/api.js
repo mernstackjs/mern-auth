@@ -22,7 +22,6 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
-      window.location.href = "/login";
     }
     return Promise.reject(error);
   }
@@ -30,4 +29,5 @@ api.interceptors.response.use(
 export const apiEndPoints = {
   register: (data) => api.post("/auth/register", data),
   login: (credential) => api.post("/auth/login", credential),
+  me: () => api.get("/user/me"),
 };
