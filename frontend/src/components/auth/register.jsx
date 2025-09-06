@@ -1,0 +1,37 @@
+export default function Register({ setIsLogin }) {
+  return (
+    <div className="border  w-96 p-5 rounded-md">
+      <h1 className="text-xl">Register Form</h1>
+
+      <form>
+        <input
+          className="border p-2 w-full my-2 rounded-md"
+          name="name"
+          placeholder="Enter Your Name"
+        />
+        <input
+          className="border p-2 w-full my-2 rounded-md"
+          name="email"
+          placeholder="Enter Your Email"
+        />
+        <input
+          className="border p-2 w-full my-2 rounded-md"
+          name="password"
+          placeholder="Enter Your Password"
+        />
+        <button className="bg-blue-700 text-white p-2 rounded-md cursor-pointer">
+          Register
+        </button>
+      </form>
+      <div className="flex mt-4 gap-3">
+        <h1>Already Have an account ? </h1>
+        <button
+          className=" underline italic cursor-pointer text-red-400"
+          onClick={() => setIsLogin(true)}
+        >
+          Login
+        </button>
+      </div>
+    </div>
+  );
+}
