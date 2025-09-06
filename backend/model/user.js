@@ -23,9 +23,12 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-userSchema.methods.comparePassword = async function () {
-  return argon.verify(this.password, password);
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  try {
+    return await argon2.verify(this.password, candidatePassword);
+  } catch (err) {
+    return false;
+  }
 };
-
 const User = model("User", userSchema);
 module.exports = User;
