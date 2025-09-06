@@ -1,5 +1,6 @@
-import { Router } from "express";
-import User from "../model/user";
+const { Router } = require("express");
+const User = require("../../model/user");
+const { generateToken } = require("../../config/generateToken");
 
 const router = Router();
 
@@ -11,7 +12,7 @@ router.post("/register", async (req, res) => {
         message: "Must fill all fields",
       });
     }
-    const isExit = await User.find({ email });
+    const isExit = await User.findOne({ email });
     if (isExit)
       return res.status(400).json({
         message: `this ${email} is already registered`,
@@ -22,9 +23,13 @@ router.post("/register", async (req, res) => {
       email,
       password,
     });
+
+    const token = generateToken(user._id);
+
     res.status(201).json({
       message: "new user is registered success",
       user,
+      token,
     });
   } catch (error) {
     res.status(500).json({
@@ -41,20 +46,21 @@ router.post("/login", async (req, res) => {
         message: "Must fill all fields",
       });
     }
-    const user = await User.find({ email });
+    const user = await User.findOne({ email });
     if (!user)
       return res.status(404).json({
         message: `Don't found this user`,
       });
 
     const isMatched = await user.comparePassword(password);
-    if (!isMatched)
-      return res.status(401).json({
-        message: "invalid credential",
-      });
+    if (!isMatched) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+    const token = generateToken(user._id);
     res.status(201).json({
       message: "new user is registered success",
       user,
+      token,
     });
   } catch (error) {
     res.status(500).json({
